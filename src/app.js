@@ -18,7 +18,7 @@ const PORT = 8080;
 app.listen(PORT, () => {
   console.log(`✅ Servidor escuchando en http://localhost:${PORT}`);
 });
-*/
+
 
 import express from 'express';
 import { engine } from 'express-handlebars';
@@ -75,3 +75,41 @@ io.on('connection', async (socket) => {
     io.emit('productList', updatedProducts);
   });
 });
+*/
+
+import express from 'express';
+import { engine } from 'express-handlebars';
+import { Server } from 'socket.io';
+import mongoose from 'mongoose';
+
+import productsRouter from './routes/products.router.js';
+import cartsRouter from './routes/carts.router.js';
+import viewsRouter from './routes/views.router.js';
+
+const app = express();
+
+// Middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+
+// Handlebars
+app.engine('handlebars', engine());
+app.set('view engine', 'handlebars');
+app.set('views', './src/views');
+
+// Rutas
+app.use('/api/products', productsRouter);
+app.use('/api/carts', cartsRouter);
+app.use('/', viewsRouter);
+
+const PORT = 8080;
+const httpServer = app.listen(PORT, () => {
+  console.log(`✅ Servidor en http://localhost:${PORT}`);
+});
+
+// MongoDB
+mongoose.connect('mongodb://127.0.0.1:27017/ecommerce')
+  .then(() => console.log('📦 Conectado a MongoDB'))
+  .catch(err => console.error('❌ Error MongoDB:', err));
+

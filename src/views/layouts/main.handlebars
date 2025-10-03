@@ -1,0 +1,35 @@
+<h1>Productos en tiempo real</h1>
+
+<ul id="listaProductos"></ul>
+
+<form id="formProducto">
+<input type="text" name="title" placeholder="Nombre" required />
+<input type="number" name="price" placeholder="Precio" required />
+<button type="submit">Agregar</button>
+</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+
+const lista = document.getElementById("listaProductos");
+const form = document.getElementById("formProducto");
+
+  // Mostrar productos nuevos
+socket.on("actualizarProductos", producto => {
+    const li = document.createElement("li");
+    li.textContent = `${producto.title} - $${producto.price}`;
+    lista.appendChild(li);
+});
+
+  // Enviar producto nuevo
+form.addEventListener("submit", e => {
+    e.preventDefault();
+    const data = {
+    title: form.title.value,
+    price: form.price.value
+    };
+    socket.emit("nuevoProducto", data);
+    form.reset();
+});
+</script>
